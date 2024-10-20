@@ -1,4 +1,5 @@
 using BookClub.Database;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using SQLitePCL;
 
@@ -10,6 +11,12 @@ builder.Services.AddControllers();  // Add support for controllers
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(); 
 builder.Services.AddDbContext<BookContext>(options => options.UseSqlite("Data Source=books.db"));
+
+// Add Identity services
+builder.Services.AddDbContext<BookContext>(options => options.UseSqlite("Data Source=books.db"));
+builder.Services.AddIdentity<IdentityUser, IdentityRole>()
+    .AddEntityFrameworkStores<BookContext>()
+    .AddDefaultTokenProviders();
 
 var app = builder.Build();
 
