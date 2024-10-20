@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using BookClub.Database;
 using BookClub.Models;
+using Microsoft.AspNetCore.Authorization;
 
 namespace BookClub.Controllers;
 
@@ -18,6 +19,7 @@ namespace BookClub.Controllers;
 
         // GET: api/Books
         [HttpGet]
+        [AllowAnonymous] 
         public async Task<ActionResult<IEnumerable<Book>>> GetBooks()
         {
             return await _context.Books.ToListAsync();
@@ -25,6 +27,7 @@ namespace BookClub.Controllers;
 
         // GET: api/Books/5
         [HttpGet("{id}")]
+        [AllowAnonymous] 
         public async Task<ActionResult<Book>> GetBook(int id)
         {
             var book = await _context.Books.FindAsync(id);
@@ -39,6 +42,7 @@ namespace BookClub.Controllers;
 
         // POST: api/Books
         [HttpPost]
+        [Authorize(Roles = "Admin,User")]
         public async Task<ActionResult<Book>> PostBook(Book book)
         {
             _context.Books.Add(book);
@@ -49,6 +53,7 @@ namespace BookClub.Controllers;
 
         // PUT: api/Books/5
         [HttpPut("{id}")]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> PutBook(int id, Book book)
         {
             if (id != book.Id)
@@ -79,6 +84,7 @@ namespace BookClub.Controllers;
 
         // DELETE: api/Books/5
         [HttpDelete("{id}")]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> DeleteBook(int id)
         {
             var book = await _context.Books.FindAsync(id);

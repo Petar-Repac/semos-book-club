@@ -15,7 +15,7 @@ public class AccountController : ControllerBase
         _userManager = userManager;
         _signInManager = signInManager;
     }
-
+    
     [HttpPost("register")]
     public async Task<IActionResult> Register([FromBody] RegisterModel model)
     {
@@ -24,6 +24,9 @@ public class AccountController : ControllerBase
 
         if (result.Succeeded)
         {
+            // Assign the "User" role by default
+            await _userManager.AddToRoleAsync(user, "User");
+
             return Ok(new { message = "User registered successfully" });
         }
 
@@ -33,14 +36,21 @@ public class AccountController : ControllerBase
     [HttpPost("login")]
     public async Task<IActionResult> Login([FromBody] LoginModel model)
     {
+        var user = await _userManager.FindByEmailAsync(model.Email);
+        if (user == null)
+        {
+            return Unauthorized(new { message = "Invalid login attempt." });
+        }
+
         var result = await _signInManager.PasswordSignInAsync(model.Email, model.Password, false, false);
 
         if (result.Succeeded)
         {
-            return Ok(new { message = "Login successful" });
+            var roles = await _userManager.GetRolesAsync(user);
+            return Ok(new { message = "Login successful", roles });
         }
 
-        return Unauthorized();
+        return Unauthorized(new { message = "Invalid login attempt." });
     }
 }
 
