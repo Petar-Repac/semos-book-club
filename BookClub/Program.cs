@@ -19,6 +19,21 @@ builder.Services.AddIdentity<IdentityUser, IdentityRole>()
     .AddEntityFrameworkStores<BookContext>()
     .AddDefaultTokenProviders();
 
+builder.Services.ConfigureApplicationCookie(options =>
+{
+    options.Cookie.HttpOnly = true;  // Protect cookies from being accessed by client-side scripts
+    options.Cookie.SecurePolicy = CookieSecurePolicy.Always;  // Send cookies only over HTTPS
+    options.Cookie.SameSite = SameSiteMode.Strict;  // Prevent cookies from being sent with cross-site requests (CSRF protection)
+    options.Cookie.Name = "BookClubAuth";  // Optional: Custom cookie name for clarity
+    options.ExpireTimeSpan = TimeSpan.FromMinutes(60);  // Expire the cookie after 60 minutes
+    options.SlidingExpiration = true;  // Extend the expiration time if the user is active
+    
+    /*
+    options.LoginPath = "/Account/Login";  // Redirect users to login page if they aren't authenticated
+    options.LogoutPath = "/Account/Logout";  // Redirect users to logout page
+    options.AccessDeniedPath = "/Account/AccessDenied";  // Redirect users when they don't have permission
+    */
+});
 
 var app = builder.Build();
 
